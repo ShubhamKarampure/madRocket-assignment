@@ -7,15 +7,13 @@ import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgr
 import { varAlpha } from 'src/theme/styles';
 import { AuthLayout } from 'src/layouts/auth';
 import { DashboardLayout } from 'src/layouts/dashboard';
-
-// ----------------------------------------------------------------------
-
+import ProtectedRoute from 'src/components/ProtectedRoute';
+// Lazy-loaded pages
 export const StudentPage = lazy(() => import('src/pages/user'));
 export const SignInPage = lazy(() => import('src/pages/sign-in'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
-// ----------------------------------------------------------------------
-
+// Fallback loader component
 const renderFallback = (
   <Box display="flex" alignItems="center" justifyContent="center" flex="1 1 auto">
     <LinearProgress
@@ -29,6 +27,7 @@ const renderFallback = (
   </Box>
 );
 
+// Main Router component
 export function Router() {
   return useRoutes([
     {
@@ -40,8 +39,14 @@ export function Router() {
         </DashboardLayout>
       ),
       children: [
-        { element: <StudentPage />, index: true },
-        { path: 'students', element: <StudentPage /> }
+        {
+          element: <ProtectedRoute element={<StudentPage />} />,
+          index: true,
+        },
+        {
+          path: 'students',
+          element: <ProtectedRoute element={<StudentPage />} />,
+        },
       ],
     },
     {

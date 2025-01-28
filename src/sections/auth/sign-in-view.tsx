@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react';
-
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import Divider from '@mui/material/Divider';
@@ -12,17 +11,31 @@ import InputAdornment from '@mui/material/InputAdornment';
 import { useRouter } from 'src/routes/hooks';
 
 import { Iconify } from 'src/components/iconify';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from 'src/firebase/firebase'; 
 
 // ----------------------------------------------------------------------
 
 export function SignInView() {
   const router = useRouter();
 
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
   const [showPassword, setShowPassword] = useState(false);
-
-  const handleSignIn = useCallback(() => {
-    router.push('/');
-  }, [router]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [signInError, setSignInError] = useState<string | null>(null); 
+  const handleSignIn = useCallback(async () => {
+    setIsLoading(true);
+    setSignInError(null); 
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      router.push('/'); 
+    } catch (error) {
+      setSignInError(error.message); 
+    } finally {
+      setIsLoading(false); 
+    }
+  }, [email, password, router]);
 
   const renderForm = (
     <Box display="flex" flexDirection="column" alignItems="flex-end">
@@ -30,7 +43,8 @@ export function SignInView() {
         fullWidth
         name="email"
         label="Email address"
-        defaultValue="hello@gmail.com"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
         InputLabelProps={{ shrink: true }}
         sx={{ mb: 3 }}
       />
@@ -43,7 +57,8 @@ export function SignInView() {
         fullWidth
         name="password"
         label="Password"
-        defaultValue="@demo1234"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
         InputLabelProps={{ shrink: true }}
         type={showPassword ? 'text' : 'password'}
         InputProps={{
@@ -61,13 +76,20 @@ export function SignInView() {
       <LoadingButton
         fullWidth
         size="large"
-        type="submit"
+        type="button"
         color="inherit"
         variant="contained"
         onClick={handleSignIn}
+        loading={isLoading} 
       >
         Sign in
       </LoadingButton>
+
+      {signInError && (
+        <Typography color="error" variant="body2" sx={{ mt: 2 }}>
+          {signInError} {/* Display the error message */}
+        </Typography>
+      )}
     </Box>
   );
 

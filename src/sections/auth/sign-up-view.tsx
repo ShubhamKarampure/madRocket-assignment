@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import Divider from '@mui/material/Divider';
@@ -7,42 +7,40 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import LoadingButton from '@mui/lab/LoadingButton';
 import InputAdornment from '@mui/material/InputAdornment';
-
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from 'src/routes/hooks';
-
 import { Iconify } from 'src/components/iconify';
-import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from 'src/firebase/firebase'; 
 import { useAuth } from 'src/context/authContext';
 // ----------------------------------------------------------------------
 
-export function SignInView() {
+export function SignUpView() {
   const router = useRouter();
   const { user } = useAuth();
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [signInError, setSignInError] = useState<string | null>(null); 
+  const [signUpError, setSignUpError] = useState<string | null>(null); 
 
   useEffect(() => {
     if (user) {
       router.push('/');
     }
   }, [user, router]);
-    
-  const handleSignIn = useCallback(async () => {
+
+  const handleSignUp = async () => {
     setIsLoading(true);
-    setSignInError(null); 
+    setSignUpError(null); 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      router.push('/'); 
+      await createUserWithEmailAndPassword(auth, email, password);
+      router.push('/');
     } catch (error) {
-      setSignInError(error.message); 
+      setSignUpError(error.message); 
     } finally {
-      setIsLoading(false); 
+      setIsLoading(false);
     }
-  }, [email, password, router]);
+  };
 
   const renderForm = (
     <Box display="flex" flexDirection="column" alignItems="flex-end">
@@ -55,10 +53,6 @@ export function SignInView() {
         InputLabelProps={{ shrink: true }}
         sx={{ mb: 3 }}
       />
-
-      <Link variant="body2" color="inherit" sx={{ mb: 1.5 }}>
-        Forgot password?
-      </Link>
 
       <TextField
         fullWidth
@@ -86,15 +80,15 @@ export function SignInView() {
         type="button"
         color="inherit"
         variant="contained"
-        onClick={handleSignIn}
-        loading={isLoading} 
+        onClick={handleSignUp}
+        loading={isLoading}
       >
-        Sign in
+        Sign up
       </LoadingButton>
 
-      {signInError && (
+      {signUpError && (
         <Typography color="error" variant="body2" sx={{ mt: 2 }}>
-          {signInError} {/* Display the error message */}
+          {signUpError}
         </Typography>
       )}
     </Box>
@@ -103,11 +97,11 @@ export function SignInView() {
   return (
     <>
       <Box gap={1.5} display="flex" flexDirection="column" alignItems="center" sx={{ mb: 5 }}>
-        <Typography variant="h5">Sign in</Typography>
+        <Typography variant="h5">Sign up</Typography>
         <Typography variant="body2" color="text.secondary">
-          Don’t have an account?
-          <Link href="/sign-up" variant="subtitle2" sx={{ ml: 0.5 }}>
-            Get started
+          Already have an account?
+          <Link href="/sign-in" variant="subtitle2" sx={{ ml: 0.5 }}>
+            Sign in
           </Link>
         </Typography>
       </Box>

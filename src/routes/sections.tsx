@@ -11,6 +11,7 @@ import ProtectedRoute from 'src/components/ProtectedRoute';
 // Lazy-loaded pages
 export const StudentPage = lazy(() => import('src/pages/user'));
 export const SignInPage = lazy(() => import('src/pages/sign-in'));
+export const SignUpPage = lazy(() => import('src/pages/sign-up'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 export const LogoutUser = lazy(() => import('src/sections/auth/logout'));
 
@@ -51,6 +52,14 @@ export function Router() {
       element: (
         <AuthLayout>
           <SignInPage />
+        </AuthLayout>
+      ),
+    },
+    {
+      path: 'sign-up',
+      element: (
+        <AuthLayout>
+          <SignUpPage />
         </AuthLayout>
       ),
     },

@@ -12,6 +12,7 @@ import ProtectedRoute from 'src/components/ProtectedRoute';
 export const StudentPage = lazy(() => import('src/pages/user'));
 export const SignInPage = lazy(() => import('src/pages/sign-in'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
+export const LogoutUser = lazy(() => import('src/sections/auth/logout'));
 
 // Fallback loader component
 const renderFallback = (
@@ -42,11 +43,7 @@ export function Router() {
         {
           element: <ProtectedRoute element={<StudentPage />} />,
           index: true,
-        },
-        {
-          path: 'students',
-          element: <ProtectedRoute element={<StudentPage />} />,
-        },
+        }
       ],
     },
     {
@@ -55,6 +52,12 @@ export function Router() {
         <AuthLayout>
           <SignInPage />
         </AuthLayout>
+      ),
+    },
+    {
+      path: 'logout-user',
+      element: (
+          <LogoutUser />
       ),
     },
     {

@@ -10,12 +10,12 @@ const icon = (name: string) => (
 export const navData = [
   {
     title: 'Student Page',
-    path: '/students',
+    path: '/',
     icon: icon('ic-user'),
   },
   {
-    title: 'Sign in',
-    path: '/sign-in',
-    icon: icon('ic-lock'),
+    title: 'Log out',
+    path: '/logout-user',
+    icon: icon('ic-disabled'),
   }
 ];

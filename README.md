@@ -1,48 +1,66 @@
-## Minimal UI ([Free version](https://free.minimals.cc/))
+# Student Management System - React App
 
-![license](https://img.shields.io/badge/license-MIT-blue.svg)
+This is a simple Student Management System built using React and Firebase. The app includes user authentication, a students' table, and a form to add student information to Firestore. The project follows the requirements outlined in the assignment provided by Team Madrocket.
 
-![preview](public/assets/images/minimal-free-preview.jpg)
+## Features
 
-> Free React Admin Dashboard made with Material-UI components and React + Vite.js.
+1. **Login Page**  
+   - Simple login page with Firebase authentication.
+   - Uses credentials:
+     - **Username**: `admin@123.com`
+     - **Password**: `admin@123`
 
-## Pages
+2. **Students Page**  
+   - Displays a table with student information:
+     - Columns: ID, Name, Class, Section, Roll Number, and Action (with icons for "View", "Edit", and "Delete").
+   - An **Add Student** button opens a modal with a form.
+   - The student form contains at least **12 fields**, covering various input types (e.g., text, number, email, date).
+   - When the form is submitted, the student data is saved in Firestore.
 
-- [Dashboard](https://free.minimals.cc/)
-- [Users](https://free.minimals.cc/user)
-- [Products](https://free.minimals.cc/products)
-- [Blog](https://free.minimals.cc/blog)
-- [Sign in](https://free.minimals.cc/sign-in)
-- [Not found](https://free.minimals.cc/404)
+3. **Dashboard Sidebar**
+   - **Students Page**: Navigates to the students' table page.
+   - **Logout**: Logs out the user and redirects to the login page.
 
-## Quick start
+## Setup Instructions
 
-- Clone the repo: `git clone https://github.com/minimal-ui-kit/material-kit-react.git`
-- Recommended: `Node.js v20.x`
-- **Install:** `npm i` or `yarn install`
-- **Start:** `npm run dev` or `yarn dev`
-- **Build:** `npm run build` or `yarn build`
-- Open browser: `http://localhost:3039`
+### Prerequisites
 
-## Upgrade to PRO Version
+- Node.js (version >= 14)
+- Firebase account and Firestore database
 
-| Minimal Free                | [Minimal Pro](https://material-ui.com/store/items/minimal-dashboard/)                                   |
-| :-------------------------- | :------------------------------------------------------------------------------------------------------ |
-| **6** Pages                 | **70+** Pages                                                                                           |
-| **Partial** theme customize | **Fully** theme customize                                                                               |
-| -                           | **Next.js** version                                                                                     |
-| -                           | **TypeScript** version (Standard Plus and Extended license)                                             |
-| -                           | Design **Figma** file (Standard Plus and Extended license)                                              |
-| -                           | Authentication with **Amplify**, **Auth0**, **JWT**, **Firebase** and **Supabase**                      |
-| -                           | Light/dark mode, right-to-left, form validation... ([+more components](https://minimals.cc/components)) |
-| -                           | Complete users flows                                                                                    |
-| -                           | 1 year of free updates / 6 months of technical support                                                  |
-| -                           | Learn more: [Package & license](https://docs.minimals.cc/package)                                       |
+### Installation
 
-## License
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/ShubhamKarampure/madRocket-assignment.git
+   cd your-repo-name
+   ```
 
-Distributed under the [MIT](https://github.com/minimal-ui-kit/minimal.free/blob/main/LICENSE.md) license.
+2. Install the dependencies:
+   ```bash
+   npm install
+   ```
 
-## Contact us
+3. Set up Firebase:
+   - Create a Firebase project and enable Firebase Authentication and Firestore in the Firebase console.
+   - Add your Firebase project configuration to the `firebase.js` file in the `src` directory.
 
-Email: support@minimals.cc
+4. Run the app locally:
+   ```bash
+   npm start
+   ```
+   The app will be available at [http://localhost:3000](http://localhost:3000).
+
+
+### Firebase Authentication Credentials
+
+- **Username**: `admin@123.com`
+- **Password**: `admin@123`
+
+## Technologies Used
+
+- **React**: Frontend framework for building the UI.
+- **Firebase**: Used for user authentication and storing data in Firestore.
+- **Material-UI**: UI components and styling framework.
+- **React Router**: For page navigation.
+- **Formik**: For handling form validation.

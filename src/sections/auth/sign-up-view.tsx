@@ -7,11 +7,11 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import LoadingButton from '@mui/lab/LoadingButton';
 import InputAdornment from '@mui/material/InputAdornment';
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { useRouter } from 'src/routes/hooks';
 import { Iconify } from 'src/components/iconify';
-import { auth } from 'src/firebase/firebase'; 
 import { useAuth } from 'src/context/authContext';
+import { auth } from 'src/firebase/firebase';
 // ----------------------------------------------------------------------
 
 export function SignUpView() {
@@ -37,6 +37,20 @@ export function SignUpView() {
       router.push('/');
     } catch (error) {
       setSignUpError(error.message); 
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle social login
+  const handleSocialLogin = async (provider: any) => {
+    setIsLoading(true);
+    setSignUpError(null);
+    try {
+      await signInWithPopup(auth, provider);
+      router.push('/');
+    } catch (error) {
+      setSignUpError(error.message);
     } finally {
       setIsLoading(false);
     }
@@ -118,14 +132,8 @@ export function SignUpView() {
       </Divider>
 
       <Box gap={1} display="flex" justifyContent="center">
-        <IconButton color="inherit">
+        <IconButton color="inherit" onClick={() => handleSocialLogin(new GoogleAuthProvider())}>
           <Iconify icon="logos:google-icon" />
-        </IconButton>
-        <IconButton color="inherit">
-          <Iconify icon="eva:github-fill" />
-        </IconButton>
-        <IconButton color="inherit">
-          <Iconify icon="ri:twitter-x-fill" />
         </IconButton>
       </Box>
     </>

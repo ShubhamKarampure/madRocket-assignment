@@ -7,14 +7,11 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import LoadingButton from '@mui/lab/LoadingButton';
 import InputAdornment from '@mui/material/InputAdornment';
-
 import { useRouter } from 'src/routes/hooks';
-
 import { Iconify } from 'src/components/iconify';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from 'src/firebase/firebase'; 
+import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { auth } from 'src/firebase/firebase';
 import { useAuth } from 'src/context/authContext';
-// ----------------------------------------------------------------------
 
 export function SignInView() {
   const router = useRouter();
@@ -23,82 +20,39 @@ export function SignInView() {
   const [password, setPassword] = useState<string>('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [signInError, setSignInError] = useState<string | null>(null); 
+  const [signInError, setSignInError] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
       router.push('/');
     }
   }, [user, router]);
-    
+
   const handleSignIn = useCallback(async () => {
     setIsLoading(true);
-    setSignInError(null); 
+    setSignInError(null);
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      router.push('/'); 
+      router.push('/');
     } catch (error) {
-      setSignInError(error.message); 
+      setSignInError(error.message);
     } finally {
-      setIsLoading(false); 
+      setIsLoading(false);
     }
   }, [email, password, router]);
 
-  const renderForm = (
-    <Box display="flex" flexDirection="column" alignItems="flex-end">
-      <TextField
-        fullWidth
-        name="email"
-        label="Email address"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        InputLabelProps={{ shrink: true }}
-        sx={{ mb: 3 }}
-      />
-
-      <Link variant="body2" color="inherit" sx={{ mb: 1.5 }}>
-        Forgot password?
-      </Link>
-
-      <TextField
-        fullWidth
-        name="password"
-        label="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        InputLabelProps={{ shrink: true }}
-        type={showPassword ? 'text' : 'password'}
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                <Iconify icon={showPassword ? 'solar:eye-bold' : 'solar:eye-closed-bold'} />
-              </IconButton>
-            </InputAdornment>
-          ),
-        }}
-        sx={{ mb: 3 }}
-      />
-
-      <LoadingButton
-        fullWidth
-        size="large"
-        type="button"
-        color="inherit"
-        variant="contained"
-        onClick={handleSignIn}
-        loading={isLoading} 
-      >
-        Sign in
-      </LoadingButton>
-
-      {signInError && (
-        <Typography color="error" variant="body2" sx={{ mt: 2 }}>
-          {signInError} {/* Display the error message */}
-        </Typography>
-      )}
-    </Box>
-  );
+  const handleGoogleSignIn = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      setIsLoading(true);
+      await signInWithPopup(auth, provider);
+      router.push('/');
+    } catch (error) {
+      setSignInError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <>
@@ -112,27 +66,67 @@ export function SignInView() {
         </Typography>
       </Box>
 
-      {renderForm}
+      <Box display="flex" flexDirection="column" alignItems="flex-end">
+        <TextField
+          fullWidth
+          name="email"
+          label="Email address"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          InputLabelProps={{ shrink: true }}
+          sx={{ mb: 3 }}
+        />
+        <Link variant="body2" color="inherit" sx={{ mb: 1.5 }}>
+          Forgot password?
+        </Link>
+        <TextField
+          fullWidth
+          name="password"
+          label="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          InputLabelProps={{ shrink: true }}
+          type={showPassword ? 'text' : 'password'}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                  <Iconify icon={showPassword ? 'solar:eye-bold' : 'solar:eye-closed-bold'} />
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+          sx={{ mb: 3 }}
+        />
+        <LoadingButton
+          fullWidth
+          size="large"
+          type="button"
+          color="inherit"
+          variant="contained"
+          onClick={handleSignIn}
+          loading={isLoading}
+        >
+          Sign in
+        </LoadingButton>
+        {signInError && (
+          <Typography color="error" variant="body2" sx={{ mt: 2 }}>
+            {signInError}
+          </Typography>
+        )}
+      </Box>
 
       <Divider sx={{ my: 3, '&::before, &::after': { borderTopStyle: 'dashed' } }}>
-        <Typography
-          variant="overline"
-          sx={{ color: 'text.secondary', fontWeight: 'fontWeightMedium' }}
-        >
+        <Typography variant="overline" sx={{ color: 'text.secondary', fontWeight: 'fontWeightMedium' }}>
           OR
         </Typography>
       </Divider>
 
       <Box gap={1} display="flex" justifyContent="center">
-        <IconButton color="inherit">
+        <IconButton color="inherit" onClick={handleGoogleSignIn}>
           <Iconify icon="logos:google-icon" />
         </IconButton>
-        <IconButton color="inherit">
-          <Iconify icon="eva:github-fill" />
-        </IconButton>
-        <IconButton color="inherit">
-          <Iconify icon="ri:twitter-x-fill" />
-        </IconButton>
+        
       </Box>
     </>
   );

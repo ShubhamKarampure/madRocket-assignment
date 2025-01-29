@@ -44,7 +44,7 @@ export function StudentsView() {
   const [editStudent, setEditStudent] = useState<Student | null>(null);
 
   const table = useTable();
-
+  
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(firestore, 'students'), (snapshot) => {
       const studentData = snapshot.docs.map((doc) => ({

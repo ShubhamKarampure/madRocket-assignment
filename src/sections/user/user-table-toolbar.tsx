@@ -1,21 +1,53 @@
+import { useState } from 'react';
 import Tooltip from '@mui/material/Tooltip';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputAdornment from '@mui/material/InputAdornment';
-
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 import { Iconify } from 'src/components/iconify';
+import { deleteMultipleStudents } from './utils';
 
-// ----------------------------------------------------------------------
-
-type UserTableToolbarProps = {
+interface UserTableToolbarProps {
   numSelected: number;
   filterName: string;
   onFilterName: (event: React.ChangeEvent<HTMLInputElement>) => void;
-};
+  selectedIds?: string[];
+  onDeleteSelected?: () => void;
+}
 
-export function UserTableToolbar({ numSelected, filterName, onFilterName }: UserTableToolbarProps) {
+
+export function UserTableToolbar({
+  numSelected,
+  filterName,
+  onFilterName,
+  selectedIds = [],
+  onDeleteSelected,
+}: UserTableToolbarProps) {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [filterMenuOpen, setFilterMenuOpen] = useState(false);
+
+  const handleFilterClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+    setFilterMenuOpen(true);
+  };
+
+  const handleFilterClose = () => {
+    setAnchorEl(null);
+    setFilterMenuOpen(false);
+  };
+
+  const handleDelete = async () => {
+    if (selectedIds.length > 0 && window.confirm('Are you sure you want to delete the selected students?')) {
+      const success = await deleteMultipleStudents(selectedIds);
+      if (success && onDeleteSelected) {
+        onDeleteSelected();
+      }
+    }
+  };
+
   return (
     <Toolbar
       sx={{
@@ -38,10 +70,14 @@ export function UserTableToolbar({ numSelected, filterName, onFilterName }: User
           fullWidth
           value={filterName}
           onChange={onFilterName}
-          placeholder="Search user..."
+          placeholder="Search by name..."
           startAdornment={
             <InputAdornment position="start">
-              <Iconify width={20} icon="eva:search-fill" sx={{ color: 'text.disabled' }} />
+              <Iconify
+                width={20}
+                icon="eva:search-fill"
+                sx={{ color: 'text.disabled' }}
+              />
             </InputAdornment>
           }
           sx={{ maxWidth: 320 }}
@@ -49,18 +85,39 @@ export function UserTableToolbar({ numSelected, filterName, onFilterName }: User
       )}
 
       {numSelected > 0 ? (
-        <Tooltip title="Delete">
-          <IconButton>
+        <Tooltip title="Delete selected">
+          <IconButton onClick={handleDelete}>
             <Iconify icon="solar:trash-bin-trash-bold" />
           </IconButton>
         </Tooltip>
       ) : (
         <Tooltip title="Filter list">
-          <IconButton>
+          <IconButton onClick={handleFilterClick}>
             <Iconify icon="ic:round-filter-list" />
           </IconButton>
         </Tooltip>
       )}
+
+      <Menu
+        anchorEl={anchorEl}
+        open={filterMenuOpen}
+        onClose={handleFilterClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+      >
+        <MenuItem onClick={handleFilterClose}>
+          Filter by Class
+        </MenuItem>
+        <MenuItem onClick={handleFilterClose}>
+          Filter by Section
+        </MenuItem>
+      </Menu>
     </Toolbar>
   );
 }

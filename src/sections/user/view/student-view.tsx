@@ -21,29 +21,27 @@ import { AddStudentModal } from '../add-student-modal';
 import { StudentTableRow } from '../student-table-row';
 import { ViewStudentModal } from '../view-student-modal';
 import { EditStudentModal } from '../edit-student-modal';
-import { useTable } from '../utils';
 import { Student } from '../type';
+import { useTable, filterStudents, deleteStudent, deleteMultipleStudents } from '../utils';
 
 const firestore = getFirestore();
+
+interface FilterState {
+  name: string;
+  class: string;
+  section: string;
+}
 
 export function StudentsView() {
   const [students, setStudents] = useState<Student[]>([]);
   const [openModal, setOpenModal] = useState(false);
-  const [filterName, setFilterName] = useState('');
+  const [filters, setFilters] = useState<FilterState>({
+    name: '',
+    class: '',
+    section: ''
+  });
   const [viewStudent, setViewStudent] = useState<Student | null>(null);
   const [editStudent, setEditStudent] = useState<Student | null>(null);
-
-  const handleView = (student: Student) => {
-    setViewStudent(student);
-  };
-
-  const handleEdit = (student: Student) => {
-    setEditStudent(student);
-  };
-
-  const handleSuccess = () => {
-    setEditStudent(null);
-  };
 
   const table = useTable();
 
@@ -59,13 +57,45 @@ export function StudentsView() {
     return () => unsubscribe();
   }, []);
 
-  const filteredStudents = students.filter((student) =>
-    student.name.toLowerCase().includes(filterName.toLowerCase())
-  );
-
-  const handleDelete = (id: string) => {
-    setStudents((prev) => prev.filter((student) => student.id !== id));
+  const handleView = (student: Student) => {
+    setViewStudent(student);
   };
+
+  const handleEdit = (student: Student) => {
+    setEditStudent(student);
+  };
+
+  const handleSuccess = () => {
+    setEditStudent(null);
+  };
+
+  const handleDelete = async (id: string) => {
+      const success = await deleteStudent(id);
+      if (!success) {
+        alert('Failed to delete student. Please try again.');
+      }
+  };
+
+  const handleBulkDelete = async () => {
+    if (table.selected.length === 0) return;
+      const success = await deleteMultipleStudents(table.selected);
+      if (success) {
+        table.onSelectAllRows(false, []);
+      } else {
+        alert('Failed to delete selected students. Please try again.');
+      }
+  };
+
+  const handleFilterChange = (field: keyof FilterState) => (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setFilters((prev) => ({
+      ...prev,
+      [field]: event.target.value,
+    }));
+  };
+
+  const filteredStudents = filterStudents(students, filters);
 
   return (
     <>
@@ -84,81 +114,82 @@ export function StudentsView() {
       </Box>
 
       <Box m={3}>
-      <Card>
-        <UserTableToolbar
-          numSelected={table.selected.length}
-          filterName={filterName}
-          onFilterName={(e) => setFilterName(e.target.value)}
-        />
+        <Card>
+          <UserTableToolbar
+            numSelected={table.selected.length}
+            filterName={filters.name}
+            onFilterName={handleFilterChange('name')}
+            selectedIds={table.selected}
+            onDeleteSelected={handleBulkDelete}
+          />
 
-        <Scrollbar>
-          <TableContainer sx={{ overflow: 'unset' }}>
-            <Table sx={{ minWidth: 700 }}>
-              <UserTableHead
-                order={table.order}
-                orderBy={table.orderBy}
-                rowCount={students.length}
-                numSelected={table.selected.length}
-                onSort={table.onSort}
-                onSelectAllRows={(checked) =>
-                  table.onSelectAllRows(
-                    checked,
-                    students.map((student) => student.id!)
-                  )
-                }
-                headLabel={[
-                  { id: 'uid', label: 'UID' },
-                  { id: 'name', label: 'Name' },
-                  { id: 'class', label: 'Class' },
-                  { id: 'section', label: 'Section' },
-                  { id: 'rollNumber', label: 'Roll Number' },
-                  { id: 'actions', label: 'Actions' },
-                ]}
-              />
-              <TableBody>
-                {filteredStudents
-                  .slice(
-                    table.page * table.rowsPerPage,
-                    table.page * table.rowsPerPage + table.rowsPerPage
-                  )
-                  .map((student) => (
-                    <StudentTableRow
-                      key={student.id}
-                      student={student}
-                      selected={table.selected.includes(student.id!)}
-                      onSelectRow={() => table.onSelectRow(student.id!)}
-                      onView={handleView}
-                      onEdit={handleEdit}
-                      onDelete={handleDelete}
-                    />
-                  ))}
-
-                <TableEmptyRows
-                  height={68}
-                  emptyRows={table.emptyRows(students.length)}
+          <Scrollbar>
+            <TableContainer sx={{ overflow: 'unset' }}>
+              <Table sx={{ minWidth: 700 }}>
+                <UserTableHead
+                  order={table.order}
+                  orderBy={table.orderBy}
+                  rowCount={students.length}
+                  numSelected={table.selected.length}
+                  onSort={table.onSort}
+                  onSelectAllRows={(checked) =>
+                    table.onSelectAllRows(
+                      checked,
+                      students.map((student) => student.id!)
+                    )
+                  }
+                  headLabel={[
+                    { id: 'uid', label: 'UID' },
+                    { id: 'name', label: 'Name' },
+                    { id: 'class', label: 'Class' },
+                    { id: 'section', label: 'Section' },
+                    { id: 'rollNumber', label: 'Roll Number' },
+                    { id: 'actions', label: 'Actions' },
+                  ]}
                 />
+                <TableBody>
+                  {filteredStudents
+                    .slice(
+                      table.page * table.rowsPerPage,
+                      table.page * table.rowsPerPage + table.rowsPerPage
+                    )
+                    .map((student) => (
+                      <StudentTableRow
+                        key={student.id}
+                        student={student}
+                        selected={table.selected.includes(student.id!)}
+                        onSelectRow={() => table.onSelectRow(student.id!)}
+                        onView={handleView}
+                        onEdit={handleEdit}
+                        onDelete={handleDelete}
+                      />
+                    ))}
 
-                {!filteredStudents.length && (
-                  <TableNoData searchQuery={filterName} />
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Scrollbar>
+                  <TableEmptyRows
+                    height={68}
+                    emptyRows={table.emptyRows(students.length)}
+                  />
 
-      <TablePagination
-        page={table.page}
-        count={filteredStudents.length}
-        rowsPerPage={table.rowsPerPage}
-        onPageChange={table.onChangePage}
-        rowsPerPageOptions={[5, 10, 25]}
-        onRowsPerPageChange={table.onChangeRowsPerPage}
-      />
+                  {!filteredStudents.length && (
+                    <TableNoData searchQuery={filters.name} />
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Scrollbar>
+
+          <TablePagination
+            page={table.page}
+            count={filteredStudents.length}
+            rowsPerPage={table.rowsPerPage}
+            onPageChange={table.onChangePage}
+            rowsPerPageOptions={[5, 10, 25]}
+            onRowsPerPageChange={table.onChangeRowsPerPage}
+          />
         </Card>
       </Box>
-      
 
-      {/* Add Modals */}
+      {/* Modals */}
       <AddStudentModal
         open={openModal}
         onClose={() => setOpenModal(false)}

@@ -134,7 +134,7 @@ export function EditStudentModal({ student, open, onClose, onSuccess }: EditStud
       if (!prev) return prev;
       return { ...prev, gender: e.target.value as string };
     });
-  }, []);
+  }, [formData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,4 +1,8 @@
 import { useState, useCallback } from 'react';
+import { doc, deleteDoc, getFirestore } from 'firebase/firestore';
+import { Student } from './type';
+
+const firestore = getFirestore();
 
 export function useTable() {
   const [page, setPage] = useState(0);
@@ -71,3 +75,45 @@ export function useTable() {
     emptyRows,
   };
 }
+
+// Extended filter types
+interface FilterState {
+  name: string;
+  class: string;
+  section: string;
+}
+
+// Filter utility function
+export const filterStudents = (students: Student[], filters: FilterState) => 
+  students.filter((student) => {
+    const nameMatch = student.name.toLowerCase().includes(filters.name.toLowerCase());
+    const classMatch = !filters.class || student.class === filters.class;
+    const sectionMatch = !filters.section || student.section === filters.section;
+    return nameMatch && classMatch && sectionMatch;
+  });
+
+
+// Delete utility function
+export const deleteStudent = async (studentId: string) => {
+  try {
+    await deleteDoc(doc(firestore, 'students', studentId));
+    return true;
+  } catch (error) {
+    console.error('Error deleting student:', error);
+    return false;
+  }
+};
+
+// Bulk delete utility function
+export const deleteMultipleStudents = async (studentIds: string[]) => {
+  try {
+    const deletePromises = studentIds.map((id) => 
+      deleteDoc(doc(firestore, 'students', id))
+    );
+    await Promise.all(deletePromises);
+    return true;
+  } catch (error) {
+    console.error('Error deleting multiple students:', error);
+    return false;
+  }
+};

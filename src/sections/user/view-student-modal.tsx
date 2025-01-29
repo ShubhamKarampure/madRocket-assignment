@@ -1,53 +1,52 @@
-import React from "react"
+import React from "react";
 import {
   Dialog,
   DialogTitle,
   DialogContent,
   Grid,
   Typography,
-  Divider,
   Box,
   IconButton,
   useTheme,
   useMediaQuery,
   Paper,
-  Chip
-} from "@mui/material"
-import CloseIcon from "@mui/icons-material/Close"
-import SchoolIcon from "@mui/icons-material/School"
-import EmailIcon from "@mui/icons-material/Email"
-import PhoneIcon from "@mui/icons-material/Phone"
-import HomeIcon from "@mui/icons-material/Home"
-import PersonIcon from "@mui/icons-material/Person"
-import type { Student } from "./type"
+  Divider,
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import SchoolIcon from "@mui/icons-material/School";
+import type { Student } from "./type";
 
 interface ViewStudentModalProps {
-  student: Student | null
-  open: boolean
-  onClose: () => void
+  student: Student | null;
+  open: boolean;
+  onClose: () => void;
 }
 
 export function ViewStudentModal({ student, open, onClose }: ViewStudentModalProps) {
-  const theme = useTheme()
-  const fullScreen = useMediaQuery(theme.breakpoints.down("md"))
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
 
-  if (!student) return null
+  if (!student) return null;
 
-  const InfoItem = ({ label, value, icon }: { label: string; value: string; icon?: React.ReactNode }) => (
-    <Box mb={2} sx={{ display: 'flex', alignItems: 'flex-start' }}>
-      {icon && (
-        <Box sx={{ mr: 1, mt: 0.5, color: 'primary.main' }}>
-          {icon}
-        </Box>
-      )}
-      <Box>
-        <Typography variant="subtitle2" gutterBottom>
-          {label}
-        </Typography>
-        <Typography variant="body1">{value}</Typography>
-      </Box>
+  const InfoField = ({ label, value }: { label: string; value: string | number }) => (
+    <Box
+      sx={{
+        p: 2,
+        mb: 2,
+        border: 1,
+        borderColor: 'divider',
+        borderRadius: 1,
+        bgcolor: 'background.paper'
+      }}
+    >
+      <Typography variant="caption" color="text.secondary" display="block" gutterBottom>
+        {label}
+      </Typography>
+      <Typography variant="body1">
+        {value}
+      </Typography>
     </Box>
-  )
+  );
 
   return (
     <Dialog
@@ -60,106 +59,110 @@ export function ViewStudentModal({ student, open, onClose }: ViewStudentModalPro
         sx: {
           borderRadius: 2,
           bgcolor: 'background.paper',
-          boxShadow: theme.customShadows?.dialog
         }
       }}
     >
       <DialogTitle
         sx={{
-          m: 0,
-          p: 2.5,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
           bgcolor: 'background.neutral'
         }}
       >
         <Box display="flex" alignItems="center">
           <SchoolIcon sx={{ mr: 1, color: 'primary.main' }} />
-          <Typography variant="h6">Student Details</Typography>
+          <Typography variant="h6">View Student</Typography>
         </Box>
-        <IconButton
-          aria-label="close"
-          onClick={onClose}
-          size="small"
-        >
+        <IconButton aria-label="close" onClick={onClose}>
           <CloseIcon />
         </IconButton>
       </DialogTitle>
 
-      <DialogContent sx={{ p: 3 }}>
-        <Paper 
-          elevation={0} 
-          sx={{ 
-            p: 3, 
-            mb: 3,
-            mt:3,
-            bgcolor: 'background.neutral',
-            borderRadius: 2 
-          }}
-        >
-          <Typography variant="h5" gutterBottom color="text.primary">
-            {student.name}
-          </Typography>
-          <Box display="flex" gap={1} alignItems="center" flexWrap="wrap">
-            <Chip 
-              label={`Class ${student.class} - Section ${student.section}`}
-              size="small"
-              color="primary"
-            />
-            <Chip 
-              label={`Roll No: ${student.rollNumber}`}
-              size="small"
-              variant="outlined"
-            />
-          </Box>
+      <DialogContent>
+        <Paper elevation={0} sx={{ p: 3, mb: 3, mt: 3, bgcolor: 'background.neutral', borderRadius: 2 }}>
+          <InfoField
+            label="Student ID"
+            value={student.uid}
+          />
+          <InfoField
+            label="Full Name"
+            value={student.name}
+          />
         </Paper>
 
         <Grid container spacing={3}>
           <Grid item xs={12} md={6}>
-            <InfoItem 
+            <InfoField
               label="Email"
               value={student.email}
-              icon={<EmailIcon fontSize="small" />}
             />
-            <InfoItem 
+            <InfoField
               label="Phone"
               value={student.phone}
-              icon={<PhoneIcon fontSize="small" />}
             />
-            <InfoItem 
+            <InfoField
               label="Date of Birth"
               value={student.dob}
-              icon={<PersonIcon fontSize="small" />}
             />
           </Grid>
+          
           <Grid item xs={12} md={6}>
-            <InfoItem 
-              label="Guardian Name"
-              value={student.guardianName}
-              icon={<PersonIcon fontSize="small" />}
-            />
-            <InfoItem 
+            <InfoField
               label="Gender"
               value={student.gender}
-              icon={<PersonIcon fontSize="small" />}
             />
-            <InfoItem 
-              label="Joining Date"
-              value={student.joiningDate}
-              icon={<SchoolIcon fontSize="small" />}
+            <InfoField
+              label="Guardian Name"
+              value={student.guardianName}
             />
+            
+            <Grid container spacing={2}>
+              <Grid item xs={4}>
+                <InfoField
+                  label="Class"
+                  value={student.class}
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <InfoField
+                  label="Section"
+                  value={student.section}
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <InfoField
+                  label="Roll No"
+                  value={student.rollNumber}
+                />
+              </Grid>
+            </Grid>
           </Grid>
+
           <Grid item xs={12}>
             <Divider sx={{ my: 2 }} />
-            <InfoItem 
+            <InfoField
               label="Address"
               value={student.address}
-              icon={<HomeIcon fontSize="small" />}
             />
           </Grid>
         </Grid>
+
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+          <IconButton
+            onClick={onClose}
+            size="large"
+            sx={{
+              bgcolor: 'background.neutral',
+              '&:hover': {
+                bgcolor: 'background.default'
+              }
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

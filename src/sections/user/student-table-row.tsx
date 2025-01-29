@@ -68,7 +68,7 @@ export function StudentTableRow({
         <TableCell>{student.section}</TableCell>
         <TableCell>{student.rollNumber}</TableCell>
 
-        <TableCell align="right">
+        <TableCell align="center">
           <IconButton onClick={handleOpenPopover}>
             <Iconify icon="eva:more-vertical-fill" />
           </IconButton>
@@ -82,7 +82,7 @@ export function StudentTableRow({
         anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <MenuList sx={{ p: 0.5, gap: 0.5, width: 140, display: 'flex', flexDirection: 'column'}}>
+        <MenuList sx={{ p: 0.5, gap: 0.5, width: 100, display: 'flex', flexDirection: 'column'}}>
             <MenuItem onClick={() => { onView(student); handleClosePopover(); }}>
             <Iconify icon="solar:eye-bold" sx={{ mr: 1 }} />
             View

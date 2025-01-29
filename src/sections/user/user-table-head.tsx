@@ -12,7 +12,7 @@ type UserTableHeadProps = {
   rowCount: number;
   numSelected: number;
   order: 'asc' | 'desc';
-  onSort: (id: string) => void;
+  onSort: (uid: string) => void;
   headLabel: Record<string, any>[];
   onSelectAllRows: (checked: boolean) => void;
 };
@@ -40,22 +40,21 @@ export function UserTableHead({
         </TableCell>
 
         {headLabel.map((headCell) => (
-          <TableCell
-            key={headCell.id}
-            align={headCell.align || 'left'}
-            sortDirection={orderBy === headCell.id ? order : false}
-            sx={{ width: headCell.width, minWidth: headCell.minWidth }}
-          >
-            <TableSortLabel
-              hideSortIcon
-              active={orderBy === headCell.id}
-              direction={orderBy === headCell.id ? order : 'asc'}
-              onClick={() => onSort(headCell.id)}
-            >
-              {headCell.label}
-            </TableSortLabel>
-          </TableCell>
-        ))}
+  <TableCell
+    key={headCell.id}
+    align={headCell.id === 'actions' ? 'right' : 'left'} 
+    sx={{ minWidth: 100 }} 
+  >
+    <TableSortLabel
+      active={orderBy === headCell.id}
+      direction={orderBy === headCell.id ? order : 'asc'}
+      onClick={() => onSort(headCell.id)}
+    >
+      {headCell.label}
+    </TableSortLabel>
+  </TableCell>
+))}
+
       </TableRow>
     </TableHead>
   );

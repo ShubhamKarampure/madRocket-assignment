@@ -55,9 +55,7 @@ export function useTable() {
     setPage(0);
   }, []);
 
-  const emptyRows = (total: number) => {
-    return page > 0 ? Math.max(0, (1 + page) * rowsPerPage - total) : 0;
-  };
+  const emptyRows = (total: number) => page > 0 ? Math.max(0, (1 + page) * rowsPerPage - total) : 0;
 
   return {
     page,

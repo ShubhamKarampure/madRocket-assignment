@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, getDocs, onSnapshot } from 'firebase/firestore';
-import { getFirestore } from 'firebase/firestore';
+import { collection, getFirestore, onSnapshot } from 'firebase/firestore';
 import {
   Box,
   Card,
@@ -70,7 +69,7 @@ export function StudentsView() {
 
   return (
     <>
-      <Box display="flex" alignItems="center" mb={5}>
+      <Box display="flex" alignItems="center" mb={5} m={3}>
         <Typography variant="h4" flexGrow={1}>
           Students
         </Typography>
@@ -84,6 +83,7 @@ export function StudentsView() {
         </Button>
       </Box>
 
+      <Box m={3}>
       <Card>
         <UserTableToolbar
           numSelected={table.selected.length}
@@ -93,7 +93,7 @@ export function StudentsView() {
 
         <Scrollbar>
           <TableContainer sx={{ overflow: 'unset' }}>
-            <Table sx={{ minWidth: 800 }}>
+            <Table sx={{ minWidth: 700 }}>
               <UserTableHead
                 order={table.order}
                 orderBy={table.orderBy}
@@ -107,13 +107,12 @@ export function StudentsView() {
                   )
                 }
                 headLabel={[
-                  { id: 'avatar', label: '' },
-                  { id: 'id', label: 'ID' },
+                  { id: 'uid', label: 'UID' },
                   { id: 'name', label: 'Name' },
                   { id: 'class', label: 'Class' },
                   { id: 'section', label: 'Section' },
                   { id: 'rollNumber', label: 'Roll Number' },
-                  { id: 'actions', label: '' },
+                  { id: 'actions', label: 'Actions' },
                 ]}
               />
               <TableBody>
@@ -149,14 +148,15 @@ export function StudentsView() {
 
       <TablePagination
         page={table.page}
-        component="div"
         count={filteredStudents.length}
         rowsPerPage={table.rowsPerPage}
         onPageChange={table.onChangePage}
         rowsPerPageOptions={[5, 10, 25]}
         onRowsPerPageChange={table.onChangeRowsPerPage}
       />
-      </Card>
+        </Card>
+      </Box>
+      
 
       {/* Add Modals */}
       <AddStudentModal

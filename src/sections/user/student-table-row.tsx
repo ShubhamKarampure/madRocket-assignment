@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import { Iconify } from 'src/components/iconify';
 import { Student } from './type';
+
 const firestore = getFirestore();
 
 interface StudentTableRowProps {
@@ -61,7 +62,7 @@ export function StudentTableRow({
           <Checkbox disableRipple checked={selected} onChange={onSelectRow} />
         </TableCell>
 
-        <TableCell>{student.id}</TableCell>
+        <TableCell>{student.uid}</TableCell>
         <TableCell>{student.name}</TableCell>
         <TableCell>{student.class}</TableCell>
         <TableCell>{student.section}</TableCell>
@@ -81,19 +82,19 @@ export function StudentTableRow({
         anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <MenuList sx={{ p: 0.5, gap: 0.5, width: 140, display: 'flex', flexDirection: 'column' }}>
-          <MenuItem onClick={() => { onView(student); handleClosePopover(); }}>
-            <Iconify icon="solar:eye-bold" />
+        <MenuList sx={{ p: 0.5, gap: 0.5, width: 140, display: 'flex', flexDirection: 'column'}}>
+            <MenuItem onClick={() => { onView(student); handleClosePopover(); }}>
+            <Iconify icon="solar:eye-bold" sx={{ mr: 1 }} />
             View
-          </MenuItem>
-          <MenuItem onClick={() => { onEdit(student); handleClosePopover(); }}>
-            <Iconify icon="solar:pen-bold" />
+            </MenuItem>
+            <MenuItem onClick={() => { onEdit(student); handleClosePopover(); }}>
+            <Iconify icon="solar:pen-bold" sx={{ mr: 1 }} />
             Edit
-          </MenuItem>
-          <MenuItem onClick={handleDelete} sx={{ color: 'error.main' }}>
-            <Iconify icon="solar:trash-bin-trash-bold" />
+            </MenuItem>
+            <MenuItem onClick={handleDelete} sx={{ color: 'error.main' }}>
+            <Iconify icon="solar:trash-bin-trash-bold" sx={{ mr: 1 }} />
             Delete
-          </MenuItem>
+            </MenuItem>
         </MenuList>
       </Popover>
     </>

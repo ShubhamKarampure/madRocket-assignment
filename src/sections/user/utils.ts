@@ -1,79 +1,75 @@
-import type { UserProps } from './user-table-row';
+import { useState, useCallback } from 'react';
 
-// ----------------------------------------------------------------------
+export function useTable() {
+  const [page, setPage] = useState(0);
+  const [order, setOrder] = useState<'asc' | 'desc'>('asc');
+  const [selected, setSelected] = useState<string[]>([]);
+  const [orderBy, setOrderBy] = useState('name');
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
-export const visuallyHidden = {
-  border: 0,
-  margin: -1,
-  padding: 0,
-  width: '1px',
-  height: '1px',
-  overflow: 'hidden',
-  position: 'absolute',
-  whiteSpace: 'nowrap',
-  clip: 'rect(0 0 0 0)',
-} as const;
+  const onSort = useCallback(
+    (id: string) => {
+      const isAsc = orderBy === id && order === 'asc';
+      setOrder(isAsc ? 'desc' : 'asc');
+      setOrderBy(id);
+    },
+    [order, orderBy]
+  );
 
-// ----------------------------------------------------------------------
+  const onSelectRow = useCallback(
+    (id: string) => {
+      const selectedIndex = selected.indexOf(id);
+      let newSelected: string[] = [];
 
-export function emptyRows(page: number, rowsPerPage: number, arrayLength: number) {
-  return page ? Math.max(0, (1 + page) * rowsPerPage - arrayLength) : 0;
-}
+      if (selectedIndex === -1) {
+        newSelected = newSelected.concat(selected, id);
+      } else if (selectedIndex === 0) {
+        newSelected = newSelected.concat(selected.slice(1));
+      } else if (selectedIndex === selected.length - 1) {
+        newSelected = newSelected.concat(selected.slice(0, -1));
+      } else if (selectedIndex > 0) {
+        newSelected = newSelected.concat(
+          selected.slice(0, selectedIndex),
+          selected.slice(selectedIndex + 1)
+        );
+      }
+      setSelected(newSelected);
+    },
+    [selected]
+  );
 
-// ----------------------------------------------------------------------
+  const onSelectAllRows = useCallback((checked: boolean, newSelecteds: string[]) => {
+    if (checked) {
+      setSelected(newSelecteds);
+      return;
+    }
+    setSelected([]);
+  }, []);
 
-function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
-}
+  const onChangePage = useCallback((event: unknown, newPage: number) => {
+    setPage(newPage);
+  }, []);
 
-// ----------------------------------------------------------------------
+  const onChangeRowsPerPage = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  }, []);
 
-export function getComparator<Key extends keyof any>(
-  order: 'asc' | 'desc',
-  orderBy: Key
-): (
-  a: {
-    [key in Key]: number | string;
-  },
-  b: {
-    [key in Key]: number | string;
-  }
-) => number {
-  return order === 'desc'
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
-}
+  const emptyRows = (total: number) => {
+    return page > 0 ? Math.max(0, (1 + page) * rowsPerPage - total) : 0;
+  };
 
-// ----------------------------------------------------------------------
-
-type ApplyFilterProps = {
-  inputData: UserProps[];
-  filterName: string;
-  comparator: (a: any, b: any) => number;
-};
-
-export function applyFilter({ inputData, comparator, filterName }: ApplyFilterProps) {
-  const stabilizedThis = inputData.map((el, index) => [el, index] as const);
-
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-
-  inputData = stabilizedThis.map((el) => el[0]);
-
-  if (filterName) {
-    inputData = inputData.filter(
-      (user) => user.name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
-    );
-  }
-
-  return inputData;
+  return {
+    page,
+    order,
+    orderBy,
+    selected,
+    rowsPerPage,
+    onSort,
+    onSelectRow,
+    onSelectAllRows,
+    onChangePage,
+    onChangeRowsPerPage,
+    emptyRows,
+  };
 }

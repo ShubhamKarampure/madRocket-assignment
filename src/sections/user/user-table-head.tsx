@@ -5,8 +5,6 @@ import TableHead from '@mui/material/TableHead';
 import TableCell from '@mui/material/TableCell';
 import TableSortLabel from '@mui/material/TableSortLabel';
 
-import { visuallyHidden } from './utils';
-
 // ----------------------------------------------------------------------
 
 type UserTableHeadProps = {
@@ -55,11 +53,6 @@ export function UserTableHead({
               onClick={() => onSort(headCell.id)}
             >
               {headCell.label}
-              {orderBy === headCell.id ? (
-                <Box sx={{ ...visuallyHidden }}>
-                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                </Box>
-              ) : null}
             </TableSortLabel>
           </TableCell>
         ))}
